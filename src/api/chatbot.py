@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
+from src.services.chatbot_service import get_reply
 
 router = APIRouter()
 
@@ -14,4 +15,5 @@ class MessageResponse(BaseModel):
 @router.post("/message", response_model=MessageResponse)
 def get_message(request: MessageRequest):
     # for now just echo back message
-    return {"reply": f"You said: {request.message}"}
+    reply = str(get_reply(request.message))
+    return MessageResponse(reply=reply)
