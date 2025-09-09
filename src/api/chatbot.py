@@ -1,19 +1,27 @@
+"""
+Chatbot API routes.
+Exposes the /api/message endpoint where users can send messages,
+and the bot replies based on stored intents"""
 from fastapi import APIRouter
 from pydantic import BaseModel
 from src.services.chatbot_service import get_reply
 
 router = APIRouter()
 
-# Request body schema
+# request schema for /api/message
 class MessageRequest(BaseModel):
     message: str
 
-# Response schem
+# response schema for /api/message
 class MessageResponse(BaseModel):
     reply: str
 
 @router.post("/message", response_model=MessageResponse)
 def get_message(request: MessageRequest):
-    # for now just echo back message
+    """
+    Endpoint: POST /api/meessage
+    Input: {"message":"hello"}
+    Output: {"reply": "Hi there!"}
+    """
     reply = str(get_reply(request.message))
-    return MessageResponse(reply=reply)
+    return {"reply": reply} # not just reply
