@@ -1,7 +1,8 @@
 """
 Chatbot service logic
 handles message processing and returns appropriate replies
-based ons tored intents in MongoDB"""
+based ons tored intents in MongoDB
+"""
 
 from src.core.database import get_collection
 from src.algorithms.edit_distance import edit_distance
@@ -14,9 +15,14 @@ def get_reply(user_message: str) -> str:
     """
     Give a user message, find a matching intent in MongoDB
     and return one of its responses. If not match is found,
-    return a default fallback response"""
+    return a default fallback response
+    
+    Matching logic:
+    1. exact match (fast)
+    2. fuxxy match using edit distance with dynamic threshold
+    """
 
-    # match by exact intent name
+    # match by exact intent name. Step 1
     intent = collection.find_one({"intent": user_message.lower()}, {"_id": 0})
     if intent:
         # randomly choose a response from the list
@@ -36,8 +42,12 @@ def get_reply(user_message: str) -> str:
             min_distance = dist
             closest_intent = candidate
 
-    # set a threshold: only accept close matches
-    if closest_intent and min_distance <= 2:
+    # dynamic threshold
+    # Short words: at least 2 edits allowed
+    # longer words: allow up to 1/3 of word length
+    threshold = max(2, len(user_message) // 3)
+
+    if closest_intent and min_distance <= threshold:
         return random.choice(closest_intent["responses"])
     
     return "I don't understand yet"
