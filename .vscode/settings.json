@@ -1,0 +1,6 @@
+{
+  "python.defaultInterpreterPath": "/Users/aaronmoore/Desktop/personal-chatbot/.venv/bin/python",
+  "python.analysis.extraPaths": [
+    "/Users/aaronmoore/Desktop/personal-chatbot/.venv/lib/python3.13/site-packages"
+  ]
+}
