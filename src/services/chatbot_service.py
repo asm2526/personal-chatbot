@@ -6,6 +6,7 @@ based ons tored intents in MongoDB
 
 from src.core.database import get_collection
 from src.algorithms.edit_distance import edit_distance
+from src.algorithms.tfidf import TfidfMatcher
 import random
 
 # Reference to "intents collection"
@@ -49,5 +50,11 @@ def get_reply(user_message: str) -> str:
 
     if closest_intent and min_distance <= threshold:
         return random.choice(closest_intent["responses"])
+    
+    # TF-IDF similarity
+    matcher = TfidfMatcher(all_intents)
+    tfidf_intent = matcher.match(user_message)
+    if tfidf_intent:
+        return random.choice(tfidf_intent["responses"])
     
     return "I don't understand yet"
