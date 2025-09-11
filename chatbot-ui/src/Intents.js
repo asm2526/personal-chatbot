@@ -77,16 +77,16 @@ function Intents() {
 
             {/* List Intents */}
             <table border="1" cellPadding="10">
-                <thread>
+                <thead>
                     <tr>
                         <th>Intent</th>
                         <th>Responses</th>
                         <th>Examples</th>
                         <th>Actions</th>
                     </tr>
-                </thread>
+                </thead>
                 <tbody>
-                    {intents.map((i, idx) => {
+                    {intents.map((i, idx) => (
                         <tr key={idx}>
                             <td>{i.intent}</td>
                             <td>{i.responses.join(", ")}</td>
@@ -95,7 +95,7 @@ function Intents() {
                                 <button onClick={() => deleteIntent(i.intent)}>Delete</button>
                             </td>
                         </tr>
-                    })}
+                    ))}
                 </tbody>
             </table>
         </div>
