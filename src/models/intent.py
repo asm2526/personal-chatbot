@@ -5,14 +5,14 @@ and also provides Swagger documentation with an example
 """
 
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 class Intent(BaseModel):
     # name of the intent
     intent: str
-
     # List of possible bot responses for this intent
     responses: List[str]
+    examples: Optional[List[str]] = []
 
     class Config:
         # Example shown in Swagger UI

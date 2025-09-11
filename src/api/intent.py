@@ -4,7 +4,7 @@ Provides full CRUD (Create, Read, Update, Delete) functionality
 for chatbot intents stored in MongoDB"""
 
 from fastapi import APIRouter, HTTPException
-from typing import List
+from typing import List, Optional
 from src.models.intent import Intent
 from src.core.database import get_collection
 
@@ -20,7 +20,7 @@ def add_intent(intent: Intent):
     if not intent.intent.strip() or not intent.responses:
         raise HTTPException(status_code=400, detail="Intent and responses are required")
     collection.insert_one(intent.dict())
-    return {"message": "Intent added successfully"}
+    return {"message": "Intent added succesfully"}
 
 # get single intent by name
 @router.get("/intent/{intent_name}", response_model=Intent | dict)

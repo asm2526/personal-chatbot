@@ -14,13 +14,10 @@ collection = get_collection("intents")
 
 def get_reply(user_message: str) -> str:
     """
-    Give a user message, find a matching intent in MongoDB
-    and return one of its responses. If not match is found,
-    return a default fallback response
-    
-    Matching logic:
-    1. exact match (fast)
-    2. fuxxy match using edit distance with dynamic threshold
+    Match user message against intents using:
+    1. Exact match
+    2. Edit distance (fuzzy)
+    3. TF-IDF similarity (semantic, multi-intent)
     """
 
     # match by exact intent name. Step 1
@@ -36,7 +33,6 @@ def get_reply(user_message: str) -> str:
     
     closest_intent = None
     min_distance = float("inf")
-
     for candidate in all_intents:
         dist = edit_distance(user_message.lower(), candidate["intent"].lower())
         if dist < min_distance:
@@ -47,14 +43,18 @@ def get_reply(user_message: str) -> str:
     # Short words: at least 2 edits allowed
     # longer words: allow up to 1/3 of word length
     threshold = max(2, len(user_message) // 3)
-
     if closest_intent and min_distance <= threshold:
         return random.choice(closest_intent["responses"])
     
     # TF-IDF similarity
     matcher = TfidfMatcher(all_intents)
-    tfidf_intent = matcher.match(user_message)
-    if tfidf_intent:
-        return random.choice(tfidf_intent["responses"])
+    tfidf_matches = matcher.match(user_message, threshold=.15)
+
+    if tfidf_matches:
+        responses = []
+        for match in tfidf_matches:
+            responses.append(random.choice(match["responses"]))
+        return " ".join(responses)
+
     
     return "I don't understand yet"
