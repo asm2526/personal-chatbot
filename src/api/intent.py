@@ -56,7 +56,7 @@ def update_intent(intent_name: str, intent: Intent):
 
 # Delete intent by name
 @router.delete("/intent/{intent_name}")
-def delete_invent(intent_name: str):
+def delete_intent(intent_name: str):
     """
     Endpoint: DELETE /api/intent/{intent_name}
     Delete an intent from the database by name
