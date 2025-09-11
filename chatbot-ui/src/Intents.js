@@ -15,20 +15,29 @@ function Intents() {
 
     // Add a new intent
     const addIntent = async () => {
+        if (!newIntent.trim() || !newResponses.trim()) {
+            alert("Intent name and at least one response are required");
+            return;
+        }
+
         const intent = {
             intent: newIntent,
             responses: newResponses.split(",").map((r) => r.trim())
         };
 
-        await fetch("/api/intent", {
+        const res = await fetch("/api/intent", {
             method: "POST",
             headers: { "Content-Type": "application/json"},
             body: JSON.stringify(intent),
-        });
+        })
 
-        setIntents([...intents, intent]);
-        setNewIntent("");
-        setNewResponses("");
+        if (res.ok) {
+            setIntents([...intents, intent]);
+            setNewIntent("");
+            setNewResponses("");
+        } else {
+            console.error("Failed to add intent")
+        }
     };
 
     // Delete an intent
