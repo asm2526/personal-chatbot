@@ -7,6 +7,7 @@ based ons tored intents in MongoDB
 from src.core.database import get_collection
 from src.algorithms.edit_distance import edit_distance
 from src.algorithms.tfidf import TfidfMatcher
+from src.algorithms.embedding_matcher import EmbeddingMatcher
 import random
 import re
 

@@ -4,6 +4,12 @@ Uses scikit-learn to vectorize text and find the closest intent
 based on cosine similarity.
 """
 
+"""
+TFIDF has now been made obsolete by more robust embedding matches
+that confirms intent by ranking instead of outputting every intent 
+that it can find...
+"""
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
