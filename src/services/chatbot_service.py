@@ -1,7 +1,7 @@
 """
 Chatbot service logic
 handles message processing and returns appropriate replies
-based ons tored intents in MongoDB
+based ons stored intents in MongoDB
 """
 
 from src.core.database import get_collection
@@ -15,6 +15,10 @@ import re
 # Reference to "intents collection"
 collection = get_collection("intents")
 
+# simple short-term memory (store last matched intent)
+context_memory = {
+    "last_intent": None
+}
 # new: simple text processing
 def preprocess(text: str) -> str:
     text = text.lower()
@@ -31,10 +35,20 @@ def get_reply(user_message: str) -> str:
 
     user_message = preprocess(user_message)
 
+    # handle vague follow-uos
+    if user_message in ["and tomorrow", "what about tomorrow", "same", "what about that", "more"]:
+        if context_memory["last_intent"]:
+            print(f"[DEBUG] Context hit: using last intent {context_memory['last_intent']['intent']}")
+            return random.choice(context_memory["last_intent"]["responses"])
+        else:
+            return "Can you clarify what you mean?"
+    
     # exact match
     intent = collection.find_one({"intent": user_message}, {"_id": 0})
     if intent:
-        return random.choice(intent["responses"])
+        context_memory["last_intent"] = intent
+        print(f"[DEBUG] Context hit: using last intent {context_memory['last_intent']['intent']}")
+        return random.choice(context_memory['last_intent']["responses"])
     
     # Load all intents
     all_intents = list(collection.find({}, {"_id": 0}))
@@ -52,6 +66,8 @@ def get_reply(user_message: str) -> str:
     
     threshold = max(2, len(user_message) // 3)
     if closest_intent and min_distance <= threshold:
+        context_memory["last_intent"] = closest_intent
+        print(f"[DEBUG] Fuzzy match: {closest_intent['intent']} (distance=[min_distance])")
         return random.choice(closest_intent["responses"])
     
     # Embedding sentence similairty (multi-intent)
@@ -64,6 +80,7 @@ def get_reply(user_message: str) -> str:
             print(f"   - {r['intent']} (score={r['score']:.3f})")
 
         best = emb_matches[0]
+        context_memory["last_intent"] = best
 
         if len(emb_matches) > 1:
             second = emb_matches[1]
