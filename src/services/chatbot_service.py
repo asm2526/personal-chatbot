@@ -6,7 +6,8 @@ based ons tored intents in MongoDB
 
 from src.core.database import get_collection
 from src.algorithms.edit_distance import edit_distance
-from src.algorithms.tfidf import TfidfMatcher
+# from src.algorithms.tfidf import TfidfMatcher
+# tfidf is now obsolete due to more robust sentence embedding matcher
 from src.algorithms.embedding_matcher import EmbeddingMatcher
 import random
 import re
@@ -53,12 +54,13 @@ def get_reply(user_message: str) -> str:
     if closest_intent and min_distance <= threshold:
         return random.choice(closest_intent["responses"])
     
-    #tf-idf mult-intent
-    matcher = TfidfMatcher(all_intents)
-    tfidf_matches = matcher.match(user_message, threshold=0.15)
+    # Embedding sentence similairty (multi-intent)
+    matcher = EmbeddingMatcher(all_intents)
+    emb_matches = matcher.match(user_message, threshold=0.4, tok_k = 2)
 
-    if tfidf_matches:
-        responses = [random.choice(m["responses"]) for m in tfidf_matches]
+    if emb_matches:
+        responses = [random.choice(m["responses"]) for m in emb_matches]
         return " ".join(responses)
+    
     
     return "I don't understand yet"
