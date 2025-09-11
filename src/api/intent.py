@@ -4,7 +4,7 @@ Provides full CRUD (Create, Read, Update, Delete) functionality
 for chatbot intents stored in MongoDB"""
 
 from fastapi import APIRouter, HTTPException
-from typing import List, Optional
+from typing import List
 from src.models.intent import Intent
 from src.core.database import get_collection
 

@@ -17,13 +17,13 @@ class TfidfMatcher:
         self.vectorizer = TfidfVectorizer()
         # Build corpus from intent names + responses
         self.intent_names = [i["intent"] for i in intents]
-        self.corpus = [
-            i["intents"] + " " + " ".join(i.get("responses", []))
-            for i in intents
-        ]
+        self.corpus = []
+        for i in intents:
+            text_parts = [i["intent"]] + i.get("responses", []) + i.get("examples", [])
+            self.corpus.append(" ".join(text_parts))
         self.tfidf_matrix = self.vectorizer.fit_transform(self.corpus)
     
-    def match(self, message, threshold=0.1):
+    def match(self, message, threshold=0.15):
         """
         Given a user message, return the closest matching intent
         if similarity is above threshold, else None.

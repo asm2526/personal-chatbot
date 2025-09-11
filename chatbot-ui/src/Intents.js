@@ -4,6 +4,7 @@ function Intents() {
     const [intents, setIntents] = useState([]);
     const [newIntent, setNewIntent] = useState("");
     const [newResponses, setNewResponses] = useState("");
+    const [newExamples, setNewExamples] = useState("")
 
     // Load all intents
     useEffect(() => {
@@ -22,7 +23,10 @@ function Intents() {
 
         const intent = {
             intent: newIntent,
-            responses: newResponses.split(",").map((r) => r.trim())
+            responses: newResponses.split(",").map((r) => r.trim()),
+            examples: newExamples
+                ? newExamples.split(",").map((e) => e.trim())
+                : [],
         };
 
         const res = await fetch("/api/intent", {
@@ -35,6 +39,7 @@ function Intents() {
             setIntents([...intents, intent]);
             setNewIntent("");
             setNewResponses("");
+            setNewExamples("");
         } else {
             console.error("Failed to add intent")
         }
@@ -49,6 +54,7 @@ function Intents() {
     return (
         <div style={{ padding: "20px"}}>
             <h2>Manage Intents</h2>
+
             {/* Add Intent Form */}
             <div style={{ marginBottom: "20px"}}>
                 <input
@@ -61,6 +67,11 @@ function Intents() {
                     onChange={(e) => setNewResponses(e.target.value)}
                     placeholder="Responses (comma separated)"
                 />
+                <input
+                    value={newExamples}
+                    onChange={(e) => setNewExamples(e.target.value)}
+                    placeholder="Examples (coma separated)"
+                />
                 <button onClick={addIntent}>Add Intent</button>
             </div>
 
@@ -70,26 +81,25 @@ function Intents() {
                     <tr>
                         <th>Intent</th>
                         <th>Responses</th>
+                        <th>Examples</th>
                         <th>Actions</th>
                     </tr>
                 </thread>
                 <tbody>
-                    {intents.map((i, idx) => (
+                    {intents.map((i, idx) => {
                         <tr key={idx}>
                             <td>{i.intent}</td>
                             <td>{i.responses.join(", ")}</td>
+                            <td>{i.examples ? i.examples.join(", ") : ""}</td>
                             <td>
                                 <button onClick={() => deleteIntent(i.intent)}>Delete</button>
                             </td>
                         </tr>
-                    ))}
+                    })}
                 </tbody>
             </table>
         </div>
-
     );
-
-
 }
 
 export default Intents;

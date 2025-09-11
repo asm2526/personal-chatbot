@@ -16,9 +16,11 @@ class Intent(BaseModel):
 
     class Config:
         # Example shown in Swagger UI
-        schema_extra = {
+        json_schema_extra = {
             "example": {
-                "intent": "hello",
-                "responses": ["Hi there!", "Hello!", "Hey!"]
+                "intent": "weather",
+                "responses": ["It's sunny!", "Looks like rain!"],
+                "examples": ["how's the weather", "what's the forecast"]
+                
             }
         }
