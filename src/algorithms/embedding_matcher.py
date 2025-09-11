@@ -13,7 +13,7 @@ class EmbeddingMatcher:
 
         self.intents = intents
         self.model = SentenceTransformer("all-MiniLM-L6-v2") # small, fast
-        self.intents_texts = []
+        self.intent_texts = []
 
         for i in intents:
             # build text using intent + examples
@@ -26,7 +26,7 @@ class EmbeddingMatcher:
         else:
             self.intent_embeddings = None
         
-    def match(self, message, threshold=0.4, top_k=2):
+    def match(self, message, top_k=3):
         """
         Return top-k intents above a similarity threshold
         """
@@ -37,15 +37,18 @@ class EmbeddingMatcher:
         cosine_scores = util.cos_sim(query_emb, self.intent_embeddings).cpu().numpy().flatten()
 
         # rank by similarity
-        rank = sorted(
-            [(idx, score) for idx, score in enumreate(cosine_scores)],
+        ranked = sorted(
+            [(idx, score) for idx, score in enumerate(cosine_scores)],
             key=lambda x: x[1],
             reverse=True
         )
 
         matches = []
         for idx, score in ranked[:top_k]:
-            if score >= threshold:
-                matches.append(self.intents[idx])
+            matches.append({
+                "intent": self.intents[idx]["intent"],
+                "responses": self.intents[idx]["responses"],
+                "score": float(score)
+            })
 
         return matches

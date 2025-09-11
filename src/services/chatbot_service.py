@@ -56,11 +56,35 @@ def get_reply(user_message: str) -> str:
     
     # Embedding sentence similairty (multi-intent)
     matcher = EmbeddingMatcher(all_intents)
-    emb_matches = matcher.match(user_message, threshold=0.4, tok_k = 2)
+    emb_matches = matcher.match(user_message, top_k = 2)
 
     if emb_matches:
-        responses = [random.choice(m["responses"]) for m in emb_matches]
-        return " ".join(responses)
+        print(f"[DEBUG] Embedding matches for '{user_message}':")
+        for r in emb_matches:
+            print(f"   - {r['intent']} (score={r['score']:.3f})")
+
+        best = emb_matches[0]
+
+        if len(emb_matches) > 1:
+            second = emb_matches[1]
+            print(
+                f"[Debug] Top1={best['intent']} ({best['score']:.3f}), "
+                f"Top2={second['intent']} ({second['score']:.3f}), "
+                f"Diff={best['score']-second['score']:.3f}"
+            )
+
+            # if both are close, combine responses
+            if best["score"] - second["score"] < 0.1 and second["score"] > 0.35:
+                reply1 = random.choice(best["responses"])
+                reply2 = random.choice(second["responses"])
+                combined = f"{reply1} {reply2}"
+                return combined
+
+        # otherwise return best single intent
+        chosen = random.choice(best["responses"])
+        print(f"[DEBUG] Best single intent chosen: {best['intent']} -> {chosen}")
+        return chosen
+
     
-    
+    print("[DEBUG] No embedding matches found")
     return "I don't understand yet"
